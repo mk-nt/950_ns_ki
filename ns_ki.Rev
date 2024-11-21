@@ -107,4 +107,4 @@ for (k in 2:maxK) {
 mymodel = model(phylogeny)
 
 monitors = VectorMonitors()
-monitors.append( mnScreen(printgen = 300, prior = FALSE, posterior = FALSE, root_freqs[1]) )
+monitors.append( mnScreen(printgen = 300, prior = FALSE, posterior = FALSE, root_freqs) )

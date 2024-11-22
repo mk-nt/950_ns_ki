@@ -15,8 +15,8 @@ moves = VectorMoves()
 
 # Uniform prior on tree topologies
 topology ~ dnUniformTopology(taxa)
-moves.append( mvNNI(topology, weight = nEdge / 10.0) )
-moves.append( mvSPR(topology, weight = nEdge / 50.0) )
+moves.append( mvNNI(topology, weight = nEdge / 8.0) )
+moves.append( mvSPR(topology, weight = nEdge / 30.0) )
 
 
 # Compound dirichlet prior on edge length variability
@@ -30,8 +30,8 @@ tree_length ~ dnGamma(shape = gamma_shape, rate = gamma_shape / exp_steps)
 moves.append( mvScale(tree_length, weight = 1.0) )
 
 rel_br_lengths ~ dnDirichlet( rep(1.0, nEdge) )
-moves.append( mvBetaSimplex(rel_br_lengths, weight = nEdge / 5.0) )
-moves.append( mvDirichletSimplex(rel_br_lengths, weight = nEdge / 50.0) )
+moves.append( mvBetaSimplex(rel_br_lengths, weight = nEdge / 3.0) )
+moves.append( mvDirichletSimplex(rel_br_lengths, weight = nEdge / 20.0) )
 br_lengths := rel_br_lengths * tree_length
 
 phylogeny := treeAssembly(topology, br_lengths)
@@ -39,7 +39,7 @@ phylogeny := treeAssembly(topology, br_lengths)
 
 # Log-normal distributed rate variation (Wagner 2012, doi: 10.1098/rsbl.2011.0523)
 rate_log_sd ~ dnGamma( 1, 1 )
-moves.append( mvScale(rate_log_sd, lambda = 1, weight = 1.0) )
+moves.append( mvScale(rate_log_sd, weight = 1.0) )
 
 # Mean = 1, so that tree length ~ character changes
 # 6 categories (see Wright & Wynd 2024,
@@ -55,7 +55,7 @@ rate_categories := fnDiscretizeDistribution( dnLognormal( 0, rate_log_sd ), 6)
 
 root_freqs ~ dnDirichlet([1, 1])
 moves.append( mvBetaSimplex(root_freqs, weight = 1.0) )
-
+rtfq1 := root_freqs[1]
 
 
 
@@ -107,4 +107,4 @@ for (k in 2:maxK) {
 mymodel = model(phylogeny)
 
 monitors = VectorMonitors()
-monitors.append( mnScreen(printgen = 300, prior = FALSE, posterior = FALSE, root_freqs) )
+monitors.append( mnScreen(printgen = 300, prior = FALSE, posterior = FALSE, rtfq1) )
